@@ -1,0 +1,75 @@
+{% extends "../base/base.html" %}
+
+{% block content %}
+<div class="container mt-5">
+    <div class="card shadow-lg">
+        <div class="card-header bg-primary text-white text-center">
+            <h2>Quiz</h2>
+        </div>
+        <div class="card-body">
+            <form id="quiz-form" method="POST" onsubmit="return validateQuizForm()">
+                {% csrf_token %}
+                {% for field in form %}
+                    <div class="mb-4">
+                        <h5 class="question-title text-dark">
+                            {{ field.label_tag }}
+                        </h5>
+                        <div class="choices">
+                            {% for choice in field.field.choices %}
+                                <div class="form-check">
+                                    <input class="form-check-input" type="radio" name="{{ field.name }}" id="{{ field.auto_id }}_{{ forloop.counter }}" value="{{ choice.0 }}">
+                                    <label class="form-check-label" for="{{ field.auto_id }}_{{ forloop.counter }}">
+                                        {{ choice.1 }}
+                                    </label>
+                                </div>
+                            {% endfor %}
+                        </div>
+                        <div class="invalid-feedback" id="error-{{ field.name }}" style="display: none;">
+                            Please select an answer.
+                        </div>
+                    </div>
+                {% endfor %}
+                <div class="text-center mt-4">
+                    <button type="submit" class="btn btn-success px-4 py-2">Submit Answers</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<script>
+    function validateQuizForm() {
+        let form = document.getElementById('quiz-form');
+        let valid = true;
+
+        // Clear previous error messages
+        let errors = document.querySelectorAll('.invalid-feedback');
+        errors.forEach(function(error) {
+            error.style.display = 'none';
+        });
+
+        // Loop through each question and check if one of the answers is checked
+        let questions = form.querySelectorAll('.form-check-input');
+        let questionGroups = {};
+
+        questions.forEach(function(input) {
+            if (!questionGroups[input.name]) {
+                questionGroups[input.name] = false;
+            }
+            if (input.checked) {
+                questionGroups[input.name] = true;
+            }
+        });
+
+        // Display error message if a question is not answered
+        for (let question in questionGroups) {
+            if (!questionGroups[question]) {
+                document.getElementById('error-' + question).style.display = 'block';
+                valid = false;
+            }
+        }
+
+        return valid; // If valid is false, the form will not submit
+    }
+</script>
+{% endblock %}

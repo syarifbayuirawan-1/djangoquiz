@@ -1,0 +1,40 @@
+{% extends "../base/base.html" %}
+
+{% block content %}
+    <h1 class="text-center mb-4">Quiz Results</h1>
+
+    <div class="card p-4">
+        <div class="alert alert-info text-center">
+            <h4>Your Score: {{ score }} out of {{ total_questions }}</h4>
+        </div>
+
+        {% if incorrect_questions %}
+            <div class="alert alert-warning">
+                <h5 class="text-danger">Incorrect Answers:</h5>
+                <ul class="list-group">
+                    {% for question in incorrect_questions %}
+                        <li class="list-group-item">
+                            <strong>{{ question.text }}</strong><br>
+                            Correct Answer: 
+                            <strong>
+                                {% for choice in question.choices.all %}
+                                    {% if choice.is_correct %}
+                                        {{ choice.text }}
+                                    {% endif %}
+                                {% endfor %}
+                            </strong>
+                        </li>
+                    {% endfor %}
+                </ul>
+            </div>
+        {% else %}
+            <div class="alert alert-success text-center">
+                <h5>Congratulations! All answers are correct!</h5>
+            </div>
+        {% endif %}
+    </div>
+
+    <div class="text-center mt-4">
+        <a href="{% url 'quiz' %}" class="btn btn-primary">Take the Quiz Again</a>
+    </div>
+{% endblock %}
